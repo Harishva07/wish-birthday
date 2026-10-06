@@ -10,8 +10,9 @@ const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:
 // This is a browser adapter, NOT a server or an authorization mechanism.
 window.fetch=async(input,options={})=>{
   const url=new URL(typeof input==='string'?input:input.url,location.origin);
-  if(url.origin!==location.origin||!(url.pathname.startsWith('/api/feedback')||url.pathname==='/api/payments/detect-price'))return nativeFetch(input,options);
+  if(url.origin!==location.origin||!url.pathname.startsWith('/api/'))return nativeFetch(input,options);
   if(url.pathname==='/api/payments/detect-price')return json({maintenance:false});
+  if(url.pathname==='/api/payments/create-order')return json({ draftId: "mock-123" });
   try{
     if(url.pathname==='/api/feedback'&&options.method==='POST'){
       const body=JSON.parse(options.body||'{}');
