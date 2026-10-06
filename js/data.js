@@ -62,11 +62,25 @@ export async function uploadMedia(file) {
   if (file.size > 50 * 1024 * 1024) throw new Error('Please choose a file smaller than 50 MB.');
   
   const ext = file.name ? file.name.split('.').pop() : mime.split('/')[1];
-  const filename = crypto.randomUUID() + '.' + ext;
+  const uuid = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+    ? crypto.randomUUID()
+    : Date.now().toString(36) + Math.random().toString(36).substring(2);
+  const filename = uuid + '.' + ext;
   const storageRef = ref(storage, 'uploads/' + filename);
   
-  await uploadBytes(storageRef, file, { contentType: mime });
-  return await getDownloadURL(storageRef);
+  try {
+    await uploadBytes(storageRef, file, { contentType: mime });
+    return await getDownloadURL(storageRef);
+  } catch (err) {
+    console.error("Firebase Storage Error:", err);
+    if (err.message && err.message.includes("does not have permission")) {
+      throw new Error("Firebase Storage Permission Denied. Please update your Firebase Storage Rules to allow uploads.");
+    }
+    if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+      throw new Error("Firebase Storage CORS Error. Please configure CORS for your Firebase Storage bucket.");
+    }
+    throw new Error("Upload failed: " + err.message);
+  }
 }
 
 export async function resolveMedia(value) {
