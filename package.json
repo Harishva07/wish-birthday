@@ -1,4 +1,5 @@
 {
+  "name": "wish-birthday",
   "devDependencies": {
     "playwright": "^1.63.0",
     "serve-handler": "^6.1.7"
