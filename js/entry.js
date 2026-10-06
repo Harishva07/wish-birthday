@@ -11,7 +11,14 @@ const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:
 window.fetch=async(input,options={})=>{
   const url=new URL(typeof input==='string'?input:input.url,location.origin);
   if(url.origin!==location.origin||!url.pathname.startsWith('/api/'))return nativeFetch(input,options);
-  if(url.pathname==='/api/payments/detect-price')return json({maintenance:false});
+  if(url.pathname==='/api/payments/detect-price'){
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      if (typeof window.__TEST_MAINTENANCE__ !== 'undefined') {
+        return json({maintenance: window.__TEST_MAINTENANCE__});
+      }
+    }
+    return json({maintenance:false});
+  }
   if(url.pathname==='/api/payments/create-order')return json({ draftId: "mock-123" });
   try{
     if(url.pathname==='/api/feedback'&&options.method==='POST'){

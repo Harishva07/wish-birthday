@@ -28,13 +28,26 @@ export function mediaType(file) {
 }
 
 export async function saveRecord(table, id, payload) {
-  const res = await fetch(`${DB_URL}/${table}/${id}.json`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  if (!res.ok) throw new Error('Save failed.');
-  return { id, draftToken: '' };
+  console.log("saveRecord called", table, id);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  try {
+    console.log("saveRecord fetching...");
+    const res = await fetch(`${DB_URL}/${table}/${id}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+    console.log("saveRecord fetched", res.ok);
+    if (!res.ok) throw new Error('Save failed.');
+    return { id, draftToken: '' };
+  } catch(e) {
+    console.log("saveRecord catch:", e.message);
+    throw e;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 export async function loadRecord(table, id) {

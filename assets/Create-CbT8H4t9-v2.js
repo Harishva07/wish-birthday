@@ -1157,7 +1157,7 @@ const Te = 512 * 1024,
         } catch (a) {
           console.error(a);
           try {
-            alert("Error saving surprise: " + (a.message || "Unknown error"));
+            window.hasSaveError = true; if(!document.querySelector(".error-message")){const ed=document.createElement("div");ed.className="error-message text-red-500 text-sm mt-2 fixed bottom-10 z-[9999]";ed.textContent="Couldn't save your surprise. Please try again.";document.body.appendChild(ed);}
           } catch (e) {}
           U(!1);
         }
@@ -1258,7 +1258,7 @@ const Te = 512 * 1024,
               ],
             }),
             e.jsxs("div", {
-              className: `flex-1 w-full mx-auto px-4 py-7 sm:p-6 flex flex-col justify-start md:justify-center relative z-10 pt-10 md:pt-6 transition-all duration-500 ${r === 4 ? "max-w-6xl" : "max-w-2xl"}`,
+              className: `flex-1 w-full mx-auto px-4 py-7 pb-36 sm:p-6 sm:pb-12 flex flex-col justify-start md:justify-center relative z-10 pt-10 md:pt-6 transition-all duration-500 ${r === 4 ? "max-w-6xl" : "max-w-2xl"}`,
               children: [
                 e.jsxs("div", {
                   className:
@@ -3394,7 +3394,7 @@ const Te = 512 * 1024,
                             children: e.jsx(M, {
                               text: f
                                 ? "Finalizing Magic..."
-                                : "Get My Surprise Link ✨",
+                                : (window.hasSaveError ? "Retry" : "Get My Surprise Link ✨"),
                               onClick: be,
                               disabled: f,
                               className:
@@ -3570,3 +3570,4 @@ const Te = 512 * 1024,
         });
   };
 export { at as Create };
+
