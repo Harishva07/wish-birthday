@@ -1,0 +1,1 @@
+import {j as e} from './vendor-core-CjvpFyCc.js';import {PolicyPage} from '../js/policy-page.js';const Contact=()=>e.jsx(PolicyPage,{type:'contact'});export {Contact};

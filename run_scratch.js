@@ -1,0 +1,1 @@
+const http = require('http'); const handler = require('serve-handler'); const server = http.createServer((r,res) => handler(r,res, {public:'.', rewrites:[{source:'**', destination:'/index.html'}]})); server.listen(8084, () => require('child_process').execSync('node scratch.js', {stdio:'inherit'})); setTimeout(() => process.exit(0), 10000);

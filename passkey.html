@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enter Passkey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: #020617;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Interactive Canvas Background */
+    #starCanvas {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: auto;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      padding: 20px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    
+    .container > * {
+      pointer-events: auto;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3.5px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: 48px;
+      margin: 0 0 12px 0;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 17px;
+      color: #94a3b8;
+      margin: 0 0 12px 0;
+    }
+
+    .hint {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: #c084fc;
+      text-transform: uppercase;
+      margin: 0 0 50px 0;
+      opacity: 0.9;
+    }
+
+    .pin-container {
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(192, 132, 252, 0.2);
+      border-radius: 40px;
+      padding: 50px 40px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      margin-bottom: 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .pin-container::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: 20%; right: 20%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(192, 132, 252, 0.8), transparent);
+    }
+
+    .pin-input {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 36px;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 20px;
+      text-align: center;
+      width: 200px;
+      padding: 10px 0;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    
+    .pin-input::placeholder {
+      letter-spacing: 15px;
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    .pin-input:focus {
+      border-bottom-color: #c084fc;
+    }
+
+    .pin-error {
+      color: #ef4444;
+      font-size: 13px;
+      margin-top: 20px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      position: absolute;
+      bottom: 20px;
+    }
+    
+    .pin-error.visible {
+      opacity: 1;
+    }
+
+    .btn {
+      background: linear-gradient(110deg, #9333ea, #c026d3);
+      border: none;
+      border-radius: 9999px;
+      color: #fff;
+      padding: 12px 14px 12px 32px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 5px 25px rgba(147, 51, 234, 0.25);
+    }
+
+    .btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 30px rgba(147, 51, 234, 0.4);
+    }
+
+    .btn-icon {
+      background: #020617;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Success Message State */
+    #successMessage {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    
+    #successMessage.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .success-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: 56px;
+      color: #fff;
+      text-shadow: 0 10px 30px rgba(192, 132, 252, 0.6);
+      margin: 0;
+      padding: 0 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Interactive Canvas Background -->
+  <canvas id="starCanvas"></canvas>
+
+  <div class="container" id="mainContainer">
+    <div class="eyebrow">The Journey Continues</div>
+    <h1 class="title">Unlock the door</h1>
+    <p class="subtitle">Enter the correct passkey to reveal your final surprise</p>
+    <p class="hint">HINT : JUST THINK , YOU KNEW IT</p>
+
+    <div class="pin-container">
+      <input type="password" id="pinInput" class="pin-input" maxlength="4" placeholder="••••" autocomplete="off" />
+      <div id="errorMsg" class="pin-error">Incorrect passkey. Try again.</div>
+    </div>
+
+    <button class="btn" id="submitBtn">
+      Unlock 🚀
+      <div class="btn-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="19" x2="19" y2="5"></line>
+          <polyline points="9 5 19 5 19 15"></polyline>
+        </svg>
+      </div>
+    </button>
+  </div>
+  
+  <div id="successMessage">
+    <h2 class="success-text">Ohh you found it! 🥰</h2>
+  </div>
+
+  <script>
+    /* =========================================
+       Interactive Starfield Background
+       ========================================= */
+    const canvas = document.getElementById('starCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let stars = [];
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetMouseX = 0;
+    let targetMouseY = 0;
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      initStars();
+    }
+
+    function initStars() {
+      stars = [];
+      const numStars = Math.floor((width * height) / 1500); 
+      for (let i = 0; i < numStars; i++) {
+        stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          z: Math.random() * 2 + 0.2, // Depth
+          baseAlpha: Math.random() * 0.7 + 0.1,
+          twinkleSpeed: (Math.random() * 0.02) + 0.005,
+          twinklePhase: Math.random() * Math.PI * 2,
+          color: Math.random() > 0.9 ? '#c084fc' : '#ffffff'
+        });
+      }
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    window.addEventListener('mousemove', (e) => {
+      targetMouseX = (e.clientX - width / 2) * 0.08;
+      targetMouseY = (e.clientY - height / 2) * 0.08;
+    });
+
+    window.addEventListener('mouseleave', () => {
+      targetMouseX = 0;
+      targetMouseY = 0;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if(e.touches.length > 0) {
+        targetMouseX = (e.touches[0].clientX - width / 2) * 0.08;
+        targetMouseY = (e.touches[0].clientY - height / 2) * 0.08;
+      }
+    });
+
+    function animate() {
+      // Use clearRect to prevent color smearing/streaking (fixes the pink screen issue)
+      ctx.clearRect(0, 0, width, height);
+      
+      mouseX += (targetMouseX - mouseX) * 0.05;
+      mouseY += (targetMouseY - mouseY) * 0.05;
+
+      stars.forEach(star => {
+        star.twinklePhase += star.twinkleSpeed;
+        const alpha = star.baseAlpha + Math.sin(star.twinklePhase) * 0.3;
+        
+        let x = star.x - (mouseX * star.z);
+        let y = star.y - (mouseY * star.z);
+        
+        if (x < 0) x += width;
+        if (x > width) x -= width;
+        if (y < 0) y += height;
+        if (y > height) y -= height;
+
+        ctx.beginPath();
+        ctx.arc(x, y, star.z * 0.7, 0, Math.PI * 2);
+        
+        if (star.z > 1.5) {
+          ctx.shadowBlur = 5;
+          ctx.shadowColor = star.color;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+
+        const finalAlpha = Math.max(0, Math.min(1, alpha));
+        
+        if(star.color === '#c084fc') {
+          ctx.fillStyle = `rgba(192, 132, 252, ${finalAlpha})`;
+        } else {
+          ctx.fillStyle = `rgba(255, 255, 255, ${finalAlpha})`;
+        }
+        
+        ctx.fill();
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    /* =========================================
+       PIN Logic & Confetti
+       ========================================= */
+    // Fetch the PIN created by the user from localStorage (fallback to 1234 if testing directly)
+    const CORRECT_PIN = localStorage.getItem('user_created_pin') || "1234";
+    const input = document.getElementById('pinInput');
+    const btn = document.getElementById('submitBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const mainContainer = document.getElementById('mainContainer');
+    const successMessage = document.getElementById('successMessage');
+
+    function checkPin() {
+      if (input.value === CORRECT_PIN) {
+        errorMsg.classList.remove('visible');
+        btn.innerHTML = 'Unlocked! <div class="btn-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>';
+        
+        // Hide the form
+        setTimeout(() => {
+          mainContainer.style.opacity = '0';
+          mainContainer.style.transform = 'scale(0.9)';
+          mainContainer.style.pointerEvents = 'none';
+          
+          // Show the success text
+          setTimeout(() => {
+            successMessage.classList.add('visible');
+            triggerConfetti();
+            
+            // Redirect or tell parent iframe we are done
+            setTimeout(() => {
+              if (window.parent !== window) {
+                window.parent.postMessage('passkey_success', '*');
+              } else {
+                window.location.href = '/index.html';
+              }
+            }, 3000);
+          }, 300);
+          
+        }, 500);
+
+      } else {
+        errorMsg.classList.add('visible');
+        input.value = '';
+        input.focus();
+        
+        const container = document.querySelector('.pin-container');
+        container.style.transform = 'translateX(-10px)';
+        setTimeout(() => container.style.transform = 'translateX(10px)', 100);
+        setTimeout(() => container.style.transform = 'translateX(-10px)', 200);
+        setTimeout(() => container.style.transform = 'translateX(10px)', 300);
+        setTimeout(() => container.style.transform = 'translateX(0)', 400);
+      }
+    }
+    
+    function triggerConfetti() {
+      const duration = 2500;
+      const end = Date.now() + duration;
+
+      (function frame() {
+        // Pop from left edge
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.7 },
+          colors: ['#c084fc', '#e9d5ff', '#ffffff']
+        });
+        // Pop from right edge
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.7 },
+          colors: ['#c084fc', '#e9d5ff', '#ffffff']
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
+    }
+
+    btn.addEventListener('click', checkPin);
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') checkPin();
+    });
+    
+    window.onload = () => input.focus();
+  </script>
+</body>
+</html>
