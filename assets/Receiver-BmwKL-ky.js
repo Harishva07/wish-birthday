@@ -2053,7 +2053,7 @@ const Cs = () => {
         const x = () => {
             window.innerHeight + window.scrollY >=
               document.documentElement.scrollHeight - 250 &&
-              (localStorage.getItem("wishprise_rating_seen") || ee(!0),
+              (localStorage.getItem("wishprise_rating_seen") || null,
               window.removeEventListener("scroll", x));
           },
           d = setTimeout(() => {
@@ -2248,11 +2248,7 @@ const Cs = () => {
           path: `/view/${h}`,
           noindex: !0,
         }),
-        e.jsx(_s, {
-          isOpen: R,
-          onClose: () => ee(!1),
-          surpriseId: h || "demo",
-        }),
+        
         e.jsx("div", {
           className: `fixed -bottom-24 left-0 z-50 transform origin-bottom-left transition-all ${Ct()}`,
           children: e.jsxs("svg", {
