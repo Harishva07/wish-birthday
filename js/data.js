@@ -57,8 +57,6 @@ export async function loadRecord(table, id) {
 }
 
 export async function uploadMedia(file) {
-  const mime = mediaType(file);
-  if (!mime) throw new Error('Please choose a supported image or audio file.');
   if (file.size > 50 * 1024 * 1024) throw new Error('Please choose a file smaller than 50 MB.');
   
   const formData = new FormData();

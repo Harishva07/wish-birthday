@@ -1157,7 +1157,7 @@ const Te = 512 * 1024,
         } catch (a) {
           console.error(a);
           try {
-            alert("Save/Upload failed: " + (a && a.message ? a.message : String(a)) + "\n\nPlease check your Firebase Storage Rules and CORS configuration."); window.hasSaveError = true; if(!document.querySelector(".error-message")){const ed=document.createElement("div");ed.className="error-message text-red-500 text-sm mt-2 fixed bottom-10 z-[9999]";ed.textContent="Couldn't save your surprise. Please try again.";document.body.appendChild(ed);}
+            alert("Save/Upload failed: " + (a && a.message ? a.message : String(a)) + "\n\nPlease try again or contact support if the issue persists."); window.hasSaveError = true; if(!document.querySelector(".error-message")){const ed=document.createElement("div");ed.className="error-message text-red-500 text-sm mt-2 fixed bottom-10 z-[9999]";ed.textContent="Couldn't save your surprise. Please try again.";document.body.appendChild(ed);}
           } catch (e) {}
           U(!1);
         }
