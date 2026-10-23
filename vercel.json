@@ -1,3 +1,6 @@
 {
-  "name": "ras-2164"
+  "name": "ras-2164",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

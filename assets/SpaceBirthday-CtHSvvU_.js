@@ -19,10 +19,24 @@ const W = () => {
     [p, o] = r.useState(!1),
     [f, s] = r.useState(""),
     [u, b] = r.useState("");
+  const k = r.useRef(null);
   r.useEffect(() => {
     const a = new Date();
     (a.setFullYear(a.getFullYear() - 20), m(a.toISOString().split("T")[0]));
   }, []);
+  const openDatePicker = () => {
+    if (k.current) {
+      if (typeof k.current.showPicker === 'function') {
+        try {
+          k.current.showPicker();
+        } catch (err) {
+          k.current.focus();
+        }
+      } else {
+        k.current.focus();
+      }
+    }
+  };
   const v = async () => {
       if (!l) {
         s("Please select a date.");
@@ -166,37 +180,52 @@ const W = () => {
           }),
           e.jsxs("div", {
             className:
-              "w-full max-w-md bg-slate-900/60 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(34,211,238,0.1)] mb-12 relative overflow-hidden group",
+              "w-full max-w-md bg-slate-900/60 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(34,211,238,0.1)] mb-12 relative shrink-0 group",
             children: [
               e.jsx("div", {
                 className:
-                  "absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none",
+                  "absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-3xl",
               }),
               e.jsxs("label", {
+                htmlFor: "space-birth-date",
+                onClick: openDatePicker,
+                id: "select-birth-date-label",
                 className:
-                  "block text-sm font-medium text-cyan-100 mb-4 flex items-center gap-2",
+                  "block text-sm font-semibold text-cyan-200 mb-3 flex items-center gap-2 cursor-pointer hover:text-cyan-400 transition-colors select-none",
                 children: [
-                  e.jsx(D, { className: "w-4 h-4" }),
+                  e.jsx(D, { className: "w-4 h-4 text-cyan-400" }),
                   " Select Your Birth Date",
                 ],
               }),
               e.jsxs("div", {
-                className: "flex gap-4",
+                className: "flex flex-col sm:flex-row gap-3",
                 children: [
-                  e.jsx("input", {
-                    type: "date",
-                    value: l,
-                    onChange: (a) => m(a.target.value),
-                    max: new Date().toISOString().split("T")[0],
-                    className:
-                      "flex-1 bg-slate-950/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500/50 transition-colors cursor-text",
-                    style: { colorScheme: "dark" },
+                  e.jsx("div", {
+                    className: "flex-1 relative cursor-pointer",
+                    onClick: openDatePicker,
+                    children: e.jsx("input", {
+                      ref: k,
+                      id: "space-birth-date",
+                      type: "date",
+                      value: l,
+                      onChange: (a) => m(a.target.value),
+                      max: new Date().toISOString().split("T")[0],
+                      className:
+                        "w-full bg-slate-950/80 border border-slate-700/60 hover:border-cyan-500/50 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20 transition-all cursor-pointer font-medium",
+                      style: { colorScheme: "dark" },
+                      onClick: (ev) => {
+                        try {
+                          ev.target.showPicker?.();
+                        } catch (_) {}
+                      },
+                    }),
                   }),
                   e.jsx("button", {
+                    id: "space-launch-btn",
                     onClick: v,
                     disabled: p,
                     className:
-                      "bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-cyan-500/25 disabled:opacity-50 flex items-center justify-center min-w-[120px]",
+                      "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-cyan-500/25 disabled:opacity-50 flex items-center justify-center min-w-[120px] active:scale-95 cursor-pointer",
                     children: p
                       ? e.jsx("div", {
                           className:
