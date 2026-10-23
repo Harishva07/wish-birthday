@@ -349,8 +349,9 @@
     /* =========================================
        PIN Logic & Confetti
        ========================================= */
-    // Fetch the PIN created by the user from localStorage (fallback to 1234 if testing directly)
-    const CORRECT_PIN = localStorage.getItem('user_created_pin') || "1234";
+    // Read PIN: URL param (receiver's device) → localStorage (creator's device) → "1234" (test only)
+    const _urlPin = new URLSearchParams(location.search).get('pin');
+    const CORRECT_PIN = (_urlPin && _urlPin.length === 4) ? _urlPin : (localStorage.getItem('user_created_pin') || "1234");
     const input = document.getElementById('pinInput');
     const btn = document.getElementById('submitBtn');
     const errorMsg = document.getElementById('errorMsg');

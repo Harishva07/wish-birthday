@@ -4580,7 +4580,8 @@ const Cs = () => {
                                 : "Walking to final surprise... ✨",
                           onClick: () => {
                             const iframe = document.createElement('iframe');
-                            iframe.src = '/passkey.html';
+                            const _pin = (r && r.pin) ? r.pin : (localStorage.getItem('user_created_pin') || '');
+                            iframe.src = '/passkey.html' + (_pin ? '?pin=' + encodeURIComponent(_pin) : '');
                             iframe.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;border:none;';
                             document.body.appendChild(iframe);
                             window.addEventListener('message', function onPass(e) {

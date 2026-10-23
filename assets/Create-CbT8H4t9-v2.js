@@ -1150,6 +1150,7 @@ const Te = 512 * 1024,
               songUrl: a,
               voiceMessageUrl: l,
               cardPhotoBase64: n || s.cardPhotoBase64 || "",
+              pin: window.tempPin || localStorage.getItem('user_created_pin') || '',
               createdAt: Date.now(),
             },
             w = await Re(t, y, { song: a, voice: l, card: n });
